@@ -72,12 +72,12 @@ function Test-PrefVar
 
     begin
     {
-        $envPath = Join-Path 'ENV:/' $Name
+        $envPath = Join-Path 'env:/' $Name
     }
 
     process
     {
-        if (Get-Item $envPath) { return $true }
+        if (Test-Path $envPath) { return $true }
         else { return $false }
     }
 }
@@ -144,7 +144,11 @@ function Get-Pref
         if ($hasInputObject)
         {
             $output = $InputObject
-            if ($Delimiter) { $output = $output -split $Delimiter | ForEach-Object { $_.Trim() } }
+            $objectCount = $InputObject | Measure-Object | Select-Object -ExpandProperty Count
+            if ($Delimiter -and ($objectCount -eq 1))
+            {
+                $output = $output -split $Delimiter | ForEach-Object { $_.Trim() }
+            }
         }
         elseif ($hasEnvVar)
         {
